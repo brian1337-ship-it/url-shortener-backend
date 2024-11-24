@@ -7,9 +7,9 @@ export const urlSchema = {
     }).min(4, { message: "You must enter a valid URL" }),
   }),
   params: object({
-    shortenedUrl: string({
-      required_error: "Please provide a shortened URL",
-    }).min(4, { message: "You must enter a valid URL" }),
+    code: string({
+      required_error: "Please provide a code for the shortened URL",
+    }).min(1, { message: "You must enter a code" }),
   }),
 };
 
