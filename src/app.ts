@@ -5,6 +5,7 @@ import { Server } from "socket.io";
 import helmet from "helmet";
 import logger from "@/utils/logger";
 import { env } from "@/utils/envConfig";
+import urlRoute from "@/modules/url.route";
 
 const app: Express = express();
 
@@ -27,8 +28,6 @@ app.use(helmet());
 // });
 
 // Routes
-app.get("/", (_, res) =>
-  res.send(`Server is up and running version ${env.HOST}`)
-);
+app.use("/url", urlRoute);
 
 export { app, logger };

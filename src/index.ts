@@ -17,7 +17,7 @@ const signals = ["SIGTERM", "SIGINT"];
 const gracefulShutdown = (signal: string) => {
   process.on(signal, async () => {
     logger.info("Got signal", signal);
-    httpServer.close();
+    server.close();
 
     logger.info("Server closed");
 
