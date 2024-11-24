@@ -5,11 +5,11 @@
   "author": "Brian Bamutange",
   "repository": "",
   "license": "ISC",
-  "main": "app.ts",
+  "main": "index.ts",
   "scripts": {
-    "dev": "tsx watch --clear-screen=false src/app.ts | pino-pretty",
+    "dev": "tsx watch --clear-screen=false src/index.ts | pino-pretty",
     "build": "tsup",
-    "start": "node dist/app.js",
+    "start": "node dist/index.js",
     "clean": "rimraf dist coverage"
   },
   "dependencies": {
