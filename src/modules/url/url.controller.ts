@@ -3,6 +3,9 @@ import { StatusCodes } from "http-status-codes";
 import { RequestUrlBody } from "./url.schema";
 import { customAlphabet } from "nanoid";
 import { env } from "@/utils/envConfig";
+import { EVENTS } from "@/utils/constants";
+import { emitAndRetry } from "../webSocket/emitAndRetry";
+import { io } from "@/app";
 
 const generateRandomCode = customAlphabet(
   "1234567890abcdefghijklmnopqrstuvwxyz",
@@ -23,9 +26,11 @@ const getShortUrl = () => {
 
 const { HOST, PORT } = env;
 
-// @desc    Shorten URL
-// @route   POST /url
-// @access  Public
+/**
+ * @desc    Shorten URL
+ * @route   POST /url
+ * @access  Public
+ */
 export async function shortenUrlHandler(
   req: Request<{}, {}, RequestUrlBody>,
   res: Response
@@ -33,7 +38,7 @@ export async function shortenUrlHandler(
   const { url } = req.body;
 
   try {
-    const encode = (longUrl: string) => {
+    const encode = async (longUrl: string) => {
       // Check if the url has already been encoded before
       if (longUrlStore.has(longUrl)) return longUrlStore.get(longUrl);
 
@@ -41,17 +46,21 @@ export async function shortenUrlHandler(
 
       while (shortUrlStore.has(shortUrl)) shortUrl = getShortUrl();
 
-      //Associate the short URL result with the URL sent by the client and persist it.
+      //Associate the short URL result with the URL sent by the client and persist it
+      await new Promise((resolve) => setTimeout(resolve, 100)); // Simulate asynchronous read/write operation
       shortUrlStore.set(shortUrl, longUrl);
       longUrlStore.set(longUrl, shortUrl);
       return shortUrl;
     };
 
-    // Simulate asynchronous read/write operation
-    await new Promise((resolve) => setTimeout(resolve, 100));
-    const shortenedUrl = encode(url);
+    const shortenedUrl = await encode(url);
 
-    return res.status(StatusCodes.CREATED).send(shortenedUrl);
+    // Emit the shortened URL to the client via socket.io
+    await emitAndRetry(io, EVENTS.SERVER.SHORTENED_URL, shortenedUrl);
+
+    return res
+      .status(StatusCodes.OK)
+      .send("Shortened URL sent to client via socket.io");
   } catch (e: any) {
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send(e.message);
   }

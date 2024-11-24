@@ -1,14 +1,17 @@
 import { env } from "@/utils/envConfig";
-import { app, logger } from "@/app";
+import { httpServer, io } from "@/app";
+import logger from "@/utils/logger";
+import socket from "@/socket";
 
-const { NODE_ENV, HOST, PORT } = env;
+const { NODE_ENV, HOST, PORT, CORS_ORIGIN } = env;
 
 // the server instance
-const server = app.listen(PORT, async () => {
+const server = httpServer.listen(PORT, async () => {
+  logger.info(`cors origin value (${CORS_ORIGIN})`);
   logger.info(`Server (${NODE_ENV}) listening  on port http://${HOST}:${PORT}`);
 
-  // initialize the socket.io
-  // socket({ io });
+  // initialize the socket.io connection
+  socket({ io });
 });
 
 // signals to listen to for termination
