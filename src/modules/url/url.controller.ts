@@ -7,11 +7,6 @@ import { EVENTS } from "@/utils/constants";
 import { emitAndRetry } from "../webSocket/emitAndRetry";
 import { io } from "@/app";
 
-const generateRandomCode = customAlphabet(
-  "1234567890abcdefghijklmnopqrstuvwxyz",
-  10
-);
-
 //Reverse lookup table for already encoded urls to avoid encoding the same url twice.
 let shortUrlStore = new Map(),
   longUrlStore = new Map();
